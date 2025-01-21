@@ -13,10 +13,12 @@ import {
   Eye,
   Sparkles,
   Settings,
+  Trash2,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Footer } from "@/components/Footer";
+import { ThemeToggle } from "@/components/theme-toggle";
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
@@ -273,6 +275,12 @@ ${text}`;
     setSuggestions(analyzePost(draft.content));
   };
 
+  const deleteDraft = (id: number) => {
+    const updatedDrafts = drafts.filter(draft => draft.id !== id);
+    setDrafts(updatedDrafts);
+    localStorage.setItem("linkedinDrafts", JSON.stringify(updatedDrafts));
+  };
+
   const getPostStats = () => {
     const words = post.trim().split(/\s+/).length;
     const chars = post.length;
@@ -286,113 +294,122 @@ ${text}`;
   const stats = getPostStats();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-8 px-4">
-        <div className="container mx-auto max-w-4xl">
-          <h1 className="text-4xl font-bold mb-4 text-center">PostPolish</h1>
-          <p className="text-xl text-center text-blue-100">
-            Transform your LinkedIn posts with AI-powered optimization
-          </p>
+    <div className="min-h-screen bg-background">
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-14 items-center">
+          <div className="flex items-center space-x-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-6 w-6 text-blue-500"
+            >
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              <path d="m9 8 3 3 3-3" />
+            </svg>
+            <h1 className="text-xl font-semibold">PostPolish</h1>
+          </div>
+          <p className="ml-4 text-sm text-muted-foreground hidden sm:block">Transform your LinkedIn posts with AI-powered optimization</p>
+          <div className="ml-auto">
+            <ThemeToggle />
+          </div>
         </div>
-      </div>
+      </header>
 
-      <div className="container mx-auto max-w-4xl px-4 py-8">
-        {/* Main Content */}
-        <div className="grid gap-6 md:grid-cols-[2fr,1fr]">
-          {/* Left Column - Post Editor */}
-          <div className="space-y-6">
-            <Card className="border-2 border-blue-100 shadow-lg">
+      <main className="container mx-auto p-4 space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-[2fr,1fr] gap-4">
+          <Card className="bg-card text-card-foreground">
+            <CardHeader>
+              <CardTitle className="text-primary flex items-center gap-2">
+                <MessageSquare className="h-5 w-5 text-blue-500" />
+                Create Your Post
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <textarea
+                className="w-full h-32 p-2 rounded-md bg-background border text-foreground"
+                placeholder="Write your LinkedIn post here..."
+                value={post}
+                onChange={handlePostChange}
+              />
+              <div className="flex gap-2 mt-4">
+                <button
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                  onClick={handleAnalyze}
+                >
+                  <Sparkles className="h-4 w-4" />
+                  {isOptimizing ? 'Optimizing...' : 'Optimize with AI'}
+                </button>
+                <button
+                  className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/80"
+                  onClick={saveDraft}
+                >
+                  <Save className="h-4 w-4" />
+                  Save Draft
+                </button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* AI Status and Suggestions */}
+          {isOptimizing && (
+            <Alert className="bg-blue-50 border-blue-200">
+              <AlertCircle className="h-4 w-4 text-blue-500" />
+              <AlertDescription className="text-blue-700">
+                Optimizing your post with AI...
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {error && (
+            <Alert variant="destructive" className="border-red-200 bg-red-50">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {aiSuggestions && (
+            <Card className="bg-card text-card-foreground">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-blue-700">
-                  <MessageSquare className="h-5 w-5" />
-                  Create Your Post
+                <CardTitle className="text-primary flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-green-500" />
+                  AI-Powered Optimization
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <textarea
-                  value={post}
-                  onChange={handlePostChange}
-                  placeholder="Write your LinkedIn post here..."
-                  className="w-full h-48 p-4 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 resize-none transition duration-200"
-                />
-                <div className="mt-4 flex gap-4">
-                  <button
-                    onClick={handleAnalyze}
-                    disabled={isOptimizing}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-200 disabled:opacity-50"
+                <div className="prose prose-blue max-w-none">
+                  <ReactMarkdown
+                    rehypePlugins={[rehypeRaw, rehypeSanitize]}
+                    remarkPlugins={[remarkGfm]}
+                    className="markdown-content"
                   >
-                    <Sparkles className="h-4 w-4" />
-                    {isOptimizing ? 'Optimizing...' : 'Optimize with AI'}
-                  </button>
-                  <button
-                    onClick={saveDraft}
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition duration-200"
-                  >
-                    <Save className="h-4 w-4" />
-                    Save Draft
-                  </button>
+                    {aiSuggestions}
+                  </ReactMarkdown>
                 </div>
               </CardContent>
             </Card>
-
-            {/* AI Status and Suggestions */}
-            {isOptimizing && (
-              <Alert className="bg-blue-50 border-blue-200">
-                <AlertCircle className="h-4 w-4 text-blue-500" />
-                <AlertDescription className="text-blue-700">
-                  Optimizing your post with AI...
-                </AlertDescription>
-              </Alert>
-            )}
-
-            {error && (
-              <Alert variant="destructive" className="border-red-200 bg-red-50">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-
-            {aiSuggestions && (
-              <Card className="border-2 border-green-100 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-green-700">
-                    <Sparkles className="h-5 w-5" />
-                    AI-Powered Optimization
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="prose prose-blue max-w-none">
-                    <ReactMarkdown
-                      rehypePlugins={[rehypeRaw, rehypeSanitize]}
-                      remarkPlugins={[remarkGfm]}
-                      className="markdown-content"
-                    >
-                      {aiSuggestions}
-                    </ReactMarkdown>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-
+          )}
           {/* Right Column - Analytics and Drafts */}
-          <div className="space-y-6">
-            <Card className="border-2 border-indigo-100 shadow-lg mb-6">
+          <div className="space-y-4">
+            <Card className="bg-card text-card-foreground">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-indigo-700">
-                  <Settings className="h-5 w-5" />
+                <CardTitle className="text-primary flex items-center gap-2">
+                  <Settings className="h-5 w-5 text-purple-500" />
                   Post Settings
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Tone</label>
+                    <label className="block text-sm text-muted-foreground mb-2">Tone</label>
                     <select
                       value={tone}
                       onChange={(e) => setTone(e.target.value as any)}
-                      className="w-full p-2 rounded-lg border-2 border-gray-200 focus:border-indigo-500"
+                      className="w-full p-2 rounded-md bg-background border text-foreground"
                     >
                       <option value="professional">Professional</option>
                       <option value="casual">Casual</option>
@@ -400,11 +417,11 @@ ${text}`;
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Length</label>
+                    <label className="block text-sm text-muted-foreground mb-2">Length</label>
                     <select
                       value={postLength}
                       onChange={(e) => setPostLength(e.target.value as any)}
-                      className="w-full p-2 rounded-lg border-2 border-gray-200 focus:border-indigo-500"
+                      className="w-full p-2 rounded-md bg-background border text-foreground"
                     >
                       <option value="short">Short (&lt;100 words)</option>
                       <option value="medium">Medium (100-200 words)</option>
@@ -415,40 +432,40 @@ ${text}`;
               </CardContent>
             </Card>
 
-            <Card className="border-2 border-purple-100 shadow-lg">
+            <Card className="bg-card text-card-foreground">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-purple-700">
-                  <BarChart className="h-5 w-5" />
+                <CardTitle className="text-primary flex items-center gap-2">
+                  <BarChart className="h-5 w-5 text-violet-500" />
                   Analytics
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Estimated Reach</span>
-                    <span className="font-semibold">{analytics.estimatedReach.toLocaleString()}</span>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Estimated Reach</span>
+                    <span className="font-medium">{analytics.estimatedReach.toLocaleString()}</span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Engagement Score</span>
-                    <span className="font-semibold">{analytics.engagement}%</span>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Engagement Score</span>
+                    <span className="font-medium">{analytics.engagement}%</span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Content Score</span>
-                    <span className="font-semibold text-blue-600">{analytics.contentScore}/100</span>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Content Score</span>
+                    <span className="font-medium text-blue-500">{analytics.contentScore}/100</span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Best Posting Time</span>
-                    <span className="font-semibold">{analytics.bestPostingTime}</span>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Best Posting Time</span>
+                    <span className="font-medium">{analytics.bestPostingTime}</span>
                   </div>
                   <div>
-                    <span className="text-gray-600 block mb-2">Recommended Hashtags</span>
+                    <span className="text-muted-foreground block mb-2">Recommended Hashtags</span>
                     <div className="flex flex-wrap gap-2">
                       {analytics.hashtagSuggestions.map((tag, index) => (
                         <span
                           key={index}
-                          className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-sm"
+                          className="px-2 py-1 bg-secondary text-secondary-foreground rounded-md text-sm"
                         >
-                          {tag}
+                          #{tag}
                         </span>
                       ))}
                     </div>
@@ -457,23 +474,32 @@ ${text}`;
               </CardContent>
             </Card>
 
-            <Card className="border-2 border-orange-100 shadow-lg">
+            <Card className="bg-card text-card-foreground">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-orange-700">
-                  <Clock className="h-5 w-5" />
+                <CardTitle className="text-primary flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-orange-500" />
                   Saved Drafts
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {drafts.map((draft) => (
-                    <div
-                      key={draft.id}
-                      className="p-3 rounded-lg bg-gray-50 hover:bg-gray-100 cursor-pointer transition duration-200"
-                      onClick={() => setPost(draft.content)}
-                    >
-                      <p className="text-sm text-gray-600 mb-1">{draft.date}</p>
-                      <p className="text-sm line-clamp-2">{draft.content}</p>
+                  {drafts.map((draft, index) => (
+                    <div key={index} className="flex items-center justify-between p-2 rounded-md bg-secondary">
+                      <span className="text-sm text-secondary-foreground">{draft.date}</span>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => loadDraft(draft)}
+                          className="p-1 hover:text-blue-500"
+                        >
+                          <Eye size={16} />
+                        </button>
+                        <button
+                          onClick={() => deleteDraft(draft.id)}
+                          className="p-1 hover:text-red-500"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -481,8 +507,20 @@ ${text}`;
             </Card>
           </div>
         </div>
-      </div>
 
+        {aiSuggestions && (
+          <Card className="bg-card text-card-foreground mt-4">
+            <CardContent className="prose prose-blue max-w-none p-4">
+              <ReactMarkdown
+                rehypePlugins={[rehypeRaw, rehypeSanitize]}
+                remarkPlugins={[remarkGfm]}
+              >
+                {aiSuggestions}
+              </ReactMarkdown>
+            </CardContent>
+          </Card>
+        )}
+      </main>
       <Footer />
     </div>
   );
