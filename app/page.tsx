@@ -15,7 +15,6 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Footer } from "@/components/Footer";
-import { ThemeToggle } from "@/components/theme-toggle";
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
@@ -288,31 +287,6 @@ ${text}`;
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center">
-          <div className="flex items-center space-x-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-6 w-6 text-blue-500"
-            >
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-              <path d="m9 8 3 3 3-3" />
-            </svg>
-            <h1 className="text-xl font-semibold">PostPolish</h1>
-          </div>
-          <p className="ml-4 text-sm text-muted-foreground hidden sm:block">Transform your LinkedIn posts with AI-powered optimization</p>
-          <div className="ml-auto">
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-
       <main className="container mx-auto p-4 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-[2fr,1fr] gap-4">
           <Card className="bg-card text-card-foreground">
