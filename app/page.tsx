@@ -3,9 +3,6 @@
 import React, { useState, useEffect } from "react";
 import {
   AlertCircle,
-  ThumbsUp,
-  Hash,
-  Users,
   MessageSquare,
   Save,
   Clock,
@@ -26,12 +23,10 @@ import remarkGfm from 'remark-gfm';
 
 const LinkedInPostOptimizer = () => {
   const [post, setPost] = useState("");
-  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [aiSuggestions, setAiSuggestions] = useState("");
   const [drafts, setDrafts] = useState<
     { id: number; content: string; date: string }[]
   >([]);
-  const [showPreview, setShowPreview] = useState(false);
   const [analytics, setAnalytics] = useState({
     estimatedReach: 0,
     engagement: 0,
@@ -44,7 +39,6 @@ const LinkedInPostOptimizer = () => {
   const [error, setError] = useState<string | null>(null);
   const [tone, setTone] = useState<'professional' | 'casual' | 'storytelling'>('professional');
   const [postLength, setPostLength] = useState<'short' | 'medium' | 'long'>('medium');
-  const [showTips, setShowTips] = useState(true);
 
   // Load drafts from localStorage on component mount
   useEffect(() => {
@@ -204,7 +198,13 @@ ${text}`;
       const aiResponse = data.response;
 
       // Parse AI response
-      setAiSuggestions(aiResponse);
+      const suggestions = aiResponse
+        .split('\n')
+        .filter((line: string) => line.trim().startsWith('-') || line.trim().startsWith('•'))
+        .map((suggestion: string) => suggestion.replace(/^[-•]\s*/, ''));
+      
+      // Update AI suggestions with the extracted suggestions
+      setAiSuggestions(suggestions.join('\n'));
       
       // Extract hashtags from the response
       const hashtagMatch = aiResponse.match(/#[a-zA-Z0-9]+/g) || [];
@@ -219,13 +219,6 @@ ${text}`;
         contentScore: extractContentScore(aiResponse) || 85,
       });
 
-      // Extract suggestions from AI response
-      const newSuggestions = aiResponse
-        .split('\n')
-        .filter((line: string) => line.trim().startsWith('-') || line.trim().startsWith('•'))
-        .map((suggestion: string) => suggestion.replace(/^[-•]\s*/, ''));
-
-      setSuggestions(newSuggestions);
     } catch (err) {
       setError('Failed to optimize post. Please try again.');
       console.error('Error optimizing post:', err);
@@ -250,7 +243,7 @@ ${text}`;
   const handlePostChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newPost = e.target.value;
     setPost(newPost);
-    setSuggestions(analyzePost(newPost));
+    analyzePost(newPost);
   };
 
   const handleAnalyze = () => {
@@ -272,7 +265,7 @@ ${text}`;
 
   const loadDraft = (draft: { id: number; content: string; date: string }) => {
     setPost(draft.content);
-    setSuggestions(analyzePost(draft.content));
+    analyzePost(draft.content);
   };
 
   const deleteDraft = (id: number) => {
@@ -291,7 +284,7 @@ ${text}`;
     return { words, chars, hashtags, mentions, lines };
   };
 
-  const stats = getPostStats();
+  const currentStats = getPostStats();
 
   return (
     <div className="min-h-screen bg-background">
@@ -352,6 +345,12 @@ ${text}`;
                   Save Draft
                 </button>
               </div>
+              <div className="text-sm text-muted-foreground mt-2 flex gap-4">
+                <span>{currentStats.words} words</span>
+                <span>{currentStats.chars} characters</span>
+                <span>{currentStats.hashtags} hashtags</span>
+                <span>{currentStats.mentions} mentions</span>
+              </div>
             </CardContent>
           </Card>
 
@@ -408,7 +407,7 @@ ${text}`;
                     <label className="block text-sm text-muted-foreground mb-2">Tone</label>
                     <select
                       value={tone}
-                      onChange={(e) => setTone(e.target.value as any)}
+                      onChange={(e) => setTone(e.target.value as 'professional' | 'casual' | 'storytelling')}
                       className="w-full p-2 rounded-md bg-background border text-foreground"
                     >
                       <option value="professional">Professional</option>
@@ -420,7 +419,7 @@ ${text}`;
                     <label className="block text-sm text-muted-foreground mb-2">Length</label>
                     <select
                       value={postLength}
-                      onChange={(e) => setPostLength(e.target.value as any)}
+                      onChange={(e) => setPostLength(e.target.value as 'short' | 'medium' | 'long')}
                       className="w-full p-2 rounded-md bg-background border text-foreground"
                     >
                       <option value="short">Short (&lt;100 words)</option>
