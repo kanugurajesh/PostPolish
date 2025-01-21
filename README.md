@@ -4,7 +4,7 @@ PostPolish is a modern web application built with Next.js that helps users creat
 
 ## Features
 
-- 🎨 Modern, responsive UI built with Next.js 14
+- 🎨 Modern, responsive UI built with Next.js 15
 - 💡 AI-powered content suggestions
 - ✨ Real-time post preview
 - 🎯 Platform-specific formatting
