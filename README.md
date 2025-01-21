@@ -1,29 +1,35 @@
 # PostPolish
 
-PostPolish is a modern web application built with Next.js that helps users create and polish their social media posts. It provides an intuitive interface for crafting engaging content with AI-powered suggestions and formatting tools.
+PostPolish is a modern web application built with Next.js that helps users create and polish their social media posts. Powered by Google's Generative AI, it provides an intuitive interface for crafting engaging content with AI-powered suggestions and formatting tools.
 
 ## Features
 
-- 🎨 Modern, responsive UI built with Next.js 14
-- 💡 AI-powered content suggestions
-- ✨ Real-time post preview
+- 🤖 AI-powered content generation using Google's Generative AI
+- 🎨 Modern, responsive UI built with Next.js 15
+- 💡 Intelligent content suggestions and improvements
+- ✨ Real-time post preview with Markdown support
 - 🎯 Platform-specific formatting
-- 🌙 Dark/Light mode support
-- 🔒 Secure authentication
+- 🌙 Dark/Light mode support using next-themes
+- 📱 Mobile-friendly responsive design
+- 🔒 Secure and performant
 
 ## Tech Stack
 
-- [Next.js 14](https://nextjs.org/) - React Framework
+- [Next.js 15](https://nextjs.org/) - React Framework
 - [Tailwind CSS](https://tailwindcss.com/) - Styling
-- [Shadcn UI](https://ui.shadcn.com/) - UI Components
+- [Google Generative AI](https://ai.google.dev/) - AI Content Generation
+- [React Markdown](https://github.com/remarkjs/react-markdown) - Markdown Rendering
+- [Next Themes](https://github.com/pacocoursey/next-themes) - Theme Management
 - [TypeScript](https://www.typescriptlang.org/) - Type Safety
+- [Lucide React](https://lucide.dev/) - Icons
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 18.17 or later
+- Node.js 20.x or later
 - npm, yarn, or pnpm
+- Google AI API Key
 
 ### Installation
 
@@ -42,7 +48,10 @@ yarn install
 pnpm install
 ```
 
-3. Create a `.env.local` file in the root directory and add necessary environment variables.
+3. Create a `.env.local` file in the root directory and add your Google AI API key:
+```env
+GOOGLE_AI_API_KEY=your_api_key_here
+```
 
 4. Start the development server:
 ```bash
@@ -72,6 +81,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 To learn more about the technologies used in this project:
 
 - [Next.js Documentation](https://nextjs.org/docs)
+- [Google AI Documentation](https://ai.google.dev/docs)
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 - [TypeScript Documentation](https://www.typescriptlang.org/docs)
 
