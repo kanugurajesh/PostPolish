@@ -126,25 +126,80 @@ const LinkedInPostOptimizer = () => {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      const optimizedSuggestions = [
-        "### Optimized Version",
+      // Generate optimized suggestions based on tone and length
+      const suggestions = [];
+      
+      // Add tone-specific suggestions
+      if (tone === 'professional') {
+        suggestions.push(
+          "### Professional Tone Optimization",
+          "Your post has been optimized for a professional audience:\n",
+          "- Use industry-specific terminology",
+          "- Maintain a formal yet approachable voice",
+          "- Focus on value and insights"
+        );
+      } else if (tone === 'casual') {
+        suggestions.push(
+          "### Casual Tone Optimization",
+          "Your post has been optimized for a casual, friendly tone:\n",
+          "- Use conversational language",
+          "- Share personal experiences",
+          "- Keep it relatable and authentic"
+        );
+      } else {
+        suggestions.push(
+          "### Storytelling Optimization",
+          "Your post has been optimized for storytelling:\n",
+          "- Start with a hook",
+          "- Build narrative tension",
+          "- End with a key takeaway"
+        );
+      }
+
+      // Add length-specific suggestions
+      suggestions.push(
+        "\n### Length Analysis",
+        `Current word count: ${post.trim().split(/\s+/).length} words`,
+        `Target for ${postLength} post: ${
+          postLength === 'short' ? '50-100' :
+          postLength === 'medium' ? '100-200' :
+          '200-300'
+        } words`
+      );
+
+      // Add engagement suggestions
+      suggestions.push(
+        "\n### Engagement Optimization",
+        "- Add relevant hashtags: #LinkedInTips #ProfessionalGrowth",
+        "- Include a call-to-action",
+        "- Ask an engaging question",
+        "- Break content into readable chunks"
+      );
+
+      // Add optimized version
+      suggestions.push(
+        "\n### Optimized Version",
         "Here's a suggested revision of your post:\n",
         post,
-        "\n### Content Analysis",
-        "- Strong points:",
-        "  - Professional tone",
-        "  - Clear message",
-        "- Areas for improvement:",
-        "  - Add more engagement hooks",
-        "  - Include relevant hashtags",
-        "\n### Engagement Tips",
-        "- Best posting time: 9:00 AM EST",
-        "- Add a call-to-action",
-        "- Encourage discussion with questions",
-      ].join("\n");
+        "\nTry adding:",
+        "- A strong opening hook",
+        "- Supporting points",
+        "- A clear call-to-action"
+      );
 
-      setAiSuggestions(optimizedSuggestions);
-      analyzePost(post);
+      setAiSuggestions(suggestions.join("\n"));
+      
+      // Update analytics with optimized metrics
+      setAnalytics(prev => ({
+        ...prev,
+        contentScore: Math.min(prev.contentScore + 15, 100),
+        estimatedReach: Math.floor(prev.estimatedReach * 1.2),
+        engagement: Math.min(prev.engagement + 10, 100),
+        optimal: true,
+        bestPostingTime: "9:00 AM EST",
+        hashtagSuggestions: ["linkedintips", "professionalgrowth", "networking", "career"],
+      }));
+
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Failed to optimize post. Please try again.";
       setError(errorMessage);
@@ -216,13 +271,12 @@ const LinkedInPostOptimizer = () => {
                     <option value="long">Long</option>
                   </select>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex gap-2">
                   <button
-                    className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                    className="px-4 py-2 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/90 transition-colors"
                     onClick={saveDraft}
-                    disabled={isOptimizing}
                   >
-                    {isOptimizing ? "Optimizing..." : "Save Draft"}
+                    Save Draft
                   </button>
                   <button
                     className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
